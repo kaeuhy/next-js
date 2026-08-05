@@ -20,6 +20,8 @@ export const getStaticProps = async () => {
             allBooks,
             recoBooks,
         },
+        // 일반적인 ISR 적용
+        // revalidate: 3,
     }
 };
 
