@@ -5,6 +5,7 @@ import {GetServerSidePropsContext, GetStaticPropsContext, InferGetServerSideProp
 import fetchBooks from "@/lib/fetch-books";
 import {useRouter} from "next/router";
 import {BookData} from "@/types";
+import Head from "next/head";
 
 // export const getStaticSideProps = async(context: GetStaticPropsContext) => {
 //   const q = context.query.q;
@@ -37,6 +38,12 @@ export default function Page() {
 
   return (
     <div>
+      <Head>
+        <title>한입북스 - 검색결과</title>
+        <meta property="og:image" content="/thumbnail.png"/>
+        <meta property="og:title" content="한입북스"/>
+        <meta property="og:description" content="한입 북스 - 검색결과"/>
+      </Head>
       {books.map((book) => (
         <BookItem key={book.id} {...book} />
       ))}
