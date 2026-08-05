@@ -1,7 +1,13 @@
 import style from "./[id].module.css";
-import {GetServerSidePropsContext, InferGetServerSidePropsType} from "next";
+import {
+    GetServerSidePropsContext,
+    GetStaticPropsContext,
+    InferGetServerSidePropsType,
+    InferGetStaticPropsType
+} from "next";
 import fetchBooks from "@/lib/fetch-books";
 import fetchOneBook from "@/lib/fetch-one-book";
+import {useRouter} from "next/router";
 
 const mockData = {
   id: 1,
@@ -15,9 +21,30 @@ const mockData = {
     "https://shopping-phinf.pstatic.net/main_3888828/38888282618.20230913071643.jpg",
 };
 
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+// 동적 SSG 적용하기위한 Paths 설정
+export const getStaticPaths = () => {
+    return {
+        paths: [
+            {params: {id: "1"}},
+            {params: {id: "2"}},
+            {params: {id: "3"}},
+        ],
+        // false: 404 Not Found 반환
+        // blocking: 즉시 생성 -> SSR처럼
+        // true: 즉시 생성 + 페이지만 미리 반환
+        fallback: true,
+    }
+}
+
+export const getStaticProps = async (context: GetStaticPropsContext) => {
     const id = context.params!.id;
     const book = await fetchOneBook(Number(id));
+
+    if (!book) {
+        return {
+            notFound: true;
+        }
+    }
     return {
         props: {
             book
@@ -25,7 +52,10 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     }
 }
 
-export default function Page({book}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Page({book}: InferGetStaticPropsType<typeof getStaticProps>) {
+    const router = useRouter();
+
+    if (router.isFallback) return "로딩중입니다.";
     if (!book) return "문제가 발생햇습니다 다시 시도하세요";
 
   const {
